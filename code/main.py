@@ -1,9 +1,19 @@
-import displayio
-from blinka_displayio_pygamedisplay import PyGameDisplay
+
 import pygame
 import time
 from adafruit_display_text import label
 import random
+
+import patch
+from blinka_displayio_pygamedisplay import PyGameDisplay
+PyGameDisplay._initialize = patch.blinka_pygame_display_initalize_patched
+PyGameDisplay._pygame_refresh = patch.blinka_pygame_display_pygamerefresh_patched
+import displayio
+displayio.Bitmap.__init__ = patch.bitmap_create_init_patched
+displayio.TileGrid._fill_area = patch.tilegrid_fill_area_patched
+displayio.Palette._get_alpha_palette = patch.palette_make_alpha_palette_patched
+
+pygame.init()
 
 display = PyGameDisplay(width=320, height=240, hw_accel=False)
 splash = displayio.Group()
@@ -18,7 +28,6 @@ splash.append(bg_sprite)
 # Must check display.running in the main loop!
 
 while True:
-    display.refresh()
     if display.check_quit():
         break
 
@@ -124,8 +133,10 @@ while True:
     if game_over == False:
         if keys[pygame.K_LEFT]:
             cat_sprite.x -= speed
+            print("LEF")
         if keys[pygame.K_RIGHT]:
             cat_sprite.x += speed
+            print("RIG")
         if random.random() < 0.05:  # spawn rate
             spawn_fireball()
 
@@ -135,6 +146,7 @@ while True:
             splash.remove(fireball)
             fireballs.remove(fireball)
         elif check_collision(cat_sprite, fireball):
+            print("DIE")
             game_over = True
             display_game_over()
 
