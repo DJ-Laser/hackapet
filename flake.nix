@@ -61,8 +61,6 @@
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [alejandra pythonEnv];
         };
-
-        packages.default = python.pkgs.adafruit-circuitpython-display-text;
       }
     );
 }
