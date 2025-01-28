@@ -23,24 +23,25 @@
 
         callAdafruitPackages = names: pypkgs: let
           packagesList =
-            lib.map (name: {
-              ${name} = pypkgs.callPackage ./packages/${name}.nix {};
+            lib.map (name: 
+            let 
+              library = pypkgs.callPackage ./packages/${name}.nix {};
+            in {
+              raw-adafruit-noruntime.${name} = library.rawPackage;
+              ${name} = library.package;
             })
             names;
-          packages = lib.foldl (a: b: a // b) {} packagesList;
+          packages = lib.foldl (a: b: lib.recursiveUpdate a b) {} packagesList;
         in
-          packages
-          // {
-            adafruit = packages;
-          };
+          packages;
 
         python = pkgs.python3.override {
           packageOverrides = pyfinal: pyprev:
             {
-              mk-adafruit-lib = pyfinal.callPackage ./packages/mk-adafruit-lib.nix {};
+              mkAdafruitLib = pyfinal.callPackage ./packages/mk-adafruit-lib.nix {};
+              blinka-displayio-pygamedisplay = pyfinal.callPackage ./packages/blinka-displayio-pygamedisplay.nix {};
             }
             // callAdafruitPackages [
-              "blinka-displayio-pygamedisplay"
               "adafruit-blinka-displayio"
               "adafruit-blinka"
               "adafruit-circuitpython-typing"

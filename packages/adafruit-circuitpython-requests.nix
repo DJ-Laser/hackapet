@@ -1,29 +1,15 @@
 {
   lib,
-  buildPythonPackage,
-  fetchPypi,
-  setuptools,
-  setuptools-scm,
-  wheel,
-  adafruit-circuitpython-connectionmanager,
+  mkAdafruitLib,
+  raw-adafruit-noruntime,
 }:
-buildPythonPackage rec {
+mkAdafruitLib {
   pname = "adafruit_circuitpython_requests";
   version = "4.1.9";
 
-  propagatedBuildInputs = [adafruit-circuitpython-connectionmanager];
+  runtimeInputs = with raw-adafruit-noruntime; [adafruit-circuitpython-connectionmanager];
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "sha256-ue6yUrQ5RvGpDDTKiETge7HgHNIQySf1YdDhC5fF/50=";
+  src = {
+    hash = "sha256-ue6yUrQ5RvGpDDTKiETge7HgHNIQySf1YdDhC5fF/50=";
   };
-
-  pyproject = true;
-  build-system = [
-    setuptools-scm
-    setuptools
-    wheel
-  ];
-
-  dontCheckRuntimeDeps = true;
 }

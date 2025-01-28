@@ -6,30 +6,29 @@
   setuptools-scm,
   wheel,
 }: let
-  cleanAttrs = lib.flip.removeAttrs [
-    "hash"
-  ];
 in
   {
     pname,
     version,
-    hash,
+    runtimeInputs,
     src ? {},
     ...
   } @ attrs: let
-    rawPackage =
-      buildPythonPackage (cleanAttrs attrs)
+    rawPackage = buildPythonPackage (attrs
       // {
         inherit pname version;
 
         src = fetchPypi (src
           // {
-            inherit pname version hash;
+            inherit pname version;
           });
 
         propagatedBuildInputs = [];
 
-        pyproject = true;
+        pyproject =
+          if attrs ? format
+          then null
+          else true;
         build-system = [
           setuptools-scm
           setuptools
@@ -37,6 +36,11 @@ in
         ];
 
         dontCheckRuntimeDeps = true;
-      };
+      });
+
+    final = runtimeInputs;
   in
-    rawPackage
+    {
+      rawPackage = rawPackage;
+      package = rawPackage;
+    }

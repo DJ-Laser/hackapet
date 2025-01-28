@@ -1,34 +1,20 @@
 {
   lib,
-  buildPythonPackage,
-  fetchPypi,
-  setuptools,
-  setuptools-scm,
-  wheel,
+  mkAdafruitLib,
+  raw-adafruit-noruntime,
   adafruit-platformdetect,
   adafruit-pureio,
   binho-host-adapter,
   pyftdi,
-  adafruit-circuitpython-typing,
   sysv-ipc,
 }:
-buildPythonPackage rec {
+mkAdafruitLib {
   pname = "adafruit_blinka";
   version = "8.51.0";
 
-  propagatedBuildInputs = [adafruit-platformdetect adafruit-pureio binho-host-adapter pyftdi adafruit-circuitpython-typing sysv-ipc];
+  runtimeInputs = with raw-adafruit-noruntime; [adafruit-circuitpython-typing] ++ [adafruit-platformdetect adafruit-pureio binho-host-adapter pyftdi sysv-ipc];
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "sha256-hE8Vvnde5cQYRGlppCfFo4R5KOZE8rGjVUKs/1sgjzo=";
+  src = {
+    hash = "sha256-hE8Vvnde5cQYRGlppCfFo4R5KOZE8rGjVUKs/1sgjzo=";
   };
-
-  pyproject = true;
-  build-system = [
-    setuptools-scm
-    setuptools
-    wheel
-  ];
-
-  dontCheckRuntimeDeps = true;
 }

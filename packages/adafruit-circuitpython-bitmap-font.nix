@@ -1,28 +1,15 @@
 {
   lib,
-  buildPythonPackage,
-  fetchPypi,
-  setuptools,
-  setuptools-scm,
-  wheel,
+  mkAdafruitLib,
+  raw-adafruit-noruntime,
 }:
-buildPythonPackage rec {
+mkAdafruitLib {
   pname = "adafruit_circuitpython_bitmap_font";
   version = "2.1.4";
 
-  propagatedBuildInputs = [];
+  runtimeInputs = [];
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "sha256-ZPJLghM+TdMiFDglJUPHABym6DXHD4+eOzK780SRKUI=";
+  src = {
+    hash = "sha256-ZPJLghM+TdMiFDglJUPHABym6DXHD4+eOzK780SRKUI=";
   };
-
-  pyproject = true;
-  build-system = [
-    setuptools-scm
-    setuptools
-    wheel
-  ];
-
-  dontCheckRuntimeDeps = true;
 }
