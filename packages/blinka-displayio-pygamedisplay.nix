@@ -25,6 +25,4 @@ buildPythonPackage rec {
     setuptools
     wheel
   ];
-
-  dontCheckRuntimeDeps = true;
 }

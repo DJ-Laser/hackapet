@@ -23,8 +23,7 @@
 
         callAdafruitPackages = names: pypkgs: let
           packagesList =
-            lib.map (name: 
-            let 
+            lib.map (name: let
               library = pypkgs.callPackage ./packages/${name}.nix {};
             in {
               raw-adafruit-noruntime.${name} = library.rawPackage;
@@ -44,12 +43,13 @@
             // callAdafruitPackages [
               "adafruit-blinka-displayio"
               "adafruit-blinka"
-              "adafruit-circuitpython-typing"
-              "adafruit-circuitpython-requests"
+              "adafruit-circuitpython-bitmap-font"
               "adafruit-circuitpython-busdevice"
               "adafruit-circuitpython-connectionmanager"
-              "adafruit-circuitpython-bitmap-font"
               "adafruit-circuitpython-display-text"
+              "adafruit-circuitpython-requests"
+              "adafruit-circuitpython-ticks"
+              "adafruit-circuitpython-typing"
             ]
             pyfinal;
         };
@@ -61,6 +61,8 @@
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [alejandra pythonEnv];
         };
+
+        packages.default = python.pkgs.adafruit-circuitpython-display-text;
       }
     );
 }

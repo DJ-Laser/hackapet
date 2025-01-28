@@ -4,4 +4,5 @@ dependencies = [
   "adafruit_circuitpython_display_text==3.2.2",
   "blinka_displayio_pygamedisplay==2.4.0",
   "pygame==2.6.1",
+  "typing-extensions==4.12.2",
 ]
