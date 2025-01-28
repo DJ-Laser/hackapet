@@ -5,7 +5,7 @@ import time
 from adafruit_display_text import label
 import random
 
-display = PyGameDisplay(width=320, height=240)
+display = PyGameDisplay(width=320, height=240, hw_accel=False)
 splash = displayio.Group()
 display.show(splash)
 
