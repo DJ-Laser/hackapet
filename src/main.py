@@ -1,31 +1,34 @@
-import pygame
 import time
-from adafruit_display_text import label
 import random
+from adafruit_display_text import label
+import pygame
+import displayio
 
 import patch
 from blinka_displayio_pygamedisplay import PyGameDisplay
 PyGameDisplay._initialize = patch.blinka_pygame_display_initalize_patched
 PyGameDisplay.refresh = patch.blinka_pygame_display_pygamerefresh_patched
-import displayio
-displayio.Bitmap.__init__ = patch.bitmap_create_init_patched
-displayio.TileGrid._fill_area = patch.tilegrid_fill_area_patched
-displayio.Palette._get_alpha_palette = patch.palette_make_alpha_palette_patched
+
+from sprites.shelly import Shelly
+
+GROUND_BITMAP = displayio.OnDiskBitmap("textures/ground.bmp")
+GROUND_SPRITE = displayio.TileGrid(
+	GROUND_BITMAP,
+	pixel_shader=GROUND_BITMAP.pixel_shader
+)
 
 display = PyGameDisplay(width=128, height=128, scale=3)
 splash = displayio.Group()
 display.show(splash)
 
-color_bitmap = displayio.Bitmap(display.width, display.height, 1)
-color_palette = displayio.Palette(1)
-color_palette[0] = 0x00FF00  # Bright Green
+player = Shelly()
 
-bg_sprite = displayio.TileGrid(color_bitmap, pixel_shader=color_palette, x=0, y=0)
-splash.append(bg_sprite)
-# Must check display.running in the main loop!
+splash.append(GROUND_SPRITE)
+splash.append(player)
 
-while True:
+while True:    
+    player.update(0, False)
+
+    display.refresh()
     if display.check_quit():
         break
-        
-    display.refresh()
