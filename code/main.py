@@ -13,9 +13,7 @@ displayio.Bitmap.__init__ = patch.bitmap_create_init_patched
 displayio.TileGrid._fill_area = patch.tilegrid_fill_area_patched
 displayio.Palette._get_alpha_palette = patch.palette_make_alpha_palette_patched
 
-pygame.init()
-
-display = PyGameDisplay(width=320, height=240, hw_accel=False)
+display = PyGameDisplay(width=320, height=240)
 splash = displayio.Group()
 display.show(splash)
 

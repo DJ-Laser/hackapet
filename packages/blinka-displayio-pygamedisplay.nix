@@ -1,7 +1,7 @@
 {
   lib,
   buildPythonPackage,
-  fetchFromGitHub,
+  fetchPypi,
   setuptools,
   setuptools-scm,
   wheel,
@@ -14,11 +14,9 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [pygame adafruit-blinka-displayio];
 
-  src = fetchFromGitHub {
-    owner = "CyrilSLi";
-    repo = "Blinka_Displayio_PyGameDisplay";
-    rev = "a7262ebd1e4f103f9aa7bc4c8c26aacd4e21259f";
-    hash = "sha256-ySHwYBi1ogj26P/cGenl0z8deWYmmrZ5dUYqIY54mtE=";
+  src = fetchPypi {
+    inherit pname version;
+    sha256 = "sha256-rr2q2qOKZD3XeUnnauRiY7lPZw7dY0TcRPobqodZkdY=";
   };
 
   pyproject = true;
