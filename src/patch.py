@@ -191,6 +191,14 @@ def blinka_pygame_display_pygamerefresh_patched(self):
         self._core._current_group._fill_area(
             buffer
         )  # pylint: disable=protected-access
+
+        # Scale the image if needed
+        if self._scale != 1:
+            buffer = buffer.resize(
+                (buffer.width * self._scale, buffer.height * self._scale),
+                resample=Image.NEAREST
+            )
+            
         # save image to buffer (or probably refresh buffer so we can compare)
         self._buffer.paste(buffer)
 

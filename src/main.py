@@ -6,13 +6,13 @@ import random
 import patch
 from blinka_displayio_pygamedisplay import PyGameDisplay
 PyGameDisplay._initialize = patch.blinka_pygame_display_initalize_patched
-PyGameDisplay._pygame_refresh = patch.blinka_pygame_display_pygamerefresh_patched
+PyGameDisplay.refresh = patch.blinka_pygame_display_pygamerefresh_patched
 import displayio
 displayio.Bitmap.__init__ = patch.bitmap_create_init_patched
 displayio.TileGrid._fill_area = patch.tilegrid_fill_area_patched
 displayio.Palette._get_alpha_palette = patch.palette_make_alpha_palette_patched
 
-display = PyGameDisplay(width=320, height=240)
+display = PyGameDisplay(width=128, height=128, scale=3)
 splash = displayio.Group()
 display.show(splash)
 
@@ -27,4 +27,5 @@ splash.append(bg_sprite)
 while True:
     if display.check_quit():
         break
-    display._pygame_refresh()
+        
+    display.refresh()
