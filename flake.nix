@@ -16,7 +16,11 @@
     flake-utils.lib.eachDefaultSystem
     (
       system: let
-        pkgs = import nixpkgs {inherit system;};
+        pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
+
         lib = pkgs.lib;
 
         pyproject = pyproject-nix.lib.project.loadPyproject {projectRoot = ./.;};
@@ -59,7 +63,7 @@
         pythonEnv = python.withPackages projectPackages;
       in {
         devShells.default = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [alejandra pythonEnv];
+          nativeBuildInputs = with pkgs; [alejandra pythonEnv aseprite];
         };
       }
     );
