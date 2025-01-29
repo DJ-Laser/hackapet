@@ -28,6 +28,8 @@ splash.append(bg_sprite)
 while True:
     if display.check_quit():
         break
+    
+    display._pygame_refresh()
 
 """
 pygame.init()
