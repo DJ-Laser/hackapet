@@ -36,7 +36,7 @@ class Shelly(Sprite):
       self.float_x = self.min_x
       self.x_velocity = 0
 
-    max_x = self.max_x - self._sprite._pixel_width
+    max_x = self.max_x - self._sprite.tile_width
     if self.float_x > max_x:
       self.float_x = max_x
       self.x_velocity = 0
@@ -45,7 +45,7 @@ class Shelly(Sprite):
       self.float_y = self.min_y
       self.y_velocity = 0
 
-    max_y = self.max_y - self._sprite._pixel_height
+    max_y = self.max_y - self._sprite.tile_height
     if self.float_y > max_y:
       self.float_y = max_y
       self.y_velocity = 0
@@ -67,18 +67,18 @@ class Shelly(Sprite):
       return
 
     if self.grounded:
-      self.y_velocity = min(-7, self.y_velocity)
+      self.y_velocity = min(-8.1, self.y_velocity)
     elif self.remaining_air_jumps > 0:
       self.remaining_air_jumps -= 1
-      self.y_velocity = min(-6, self.y_velocity)
+      self.y_velocity = min(-6.9, self.y_velocity)
     else:
       return
     
     self.jump_held = True
     
   def update(self, movement_direction, jump):
-    if jump and self.jump_held and self.y_velocity < 0:
-      self.y_velocity += 0.8
+    if (not (jump and self.jump_held)) and self.y_velocity < 0:
+      self.y_velocity += 1.4
     else:
       self.y_velocity += 1
     
@@ -91,7 +91,7 @@ class Shelly(Sprite):
     self.clamp_y_velocity(10)
     self.float_y += self.y_velocity
 
-    self.x_velocity = self.x_velocity + movement_direction * 0.5
+    self.x_velocity = self.x_velocity + movement_direction * 1.5
     if movement_direction > 0:
       self._sprite.flip_x = True
     elif movement_direction < 0:
