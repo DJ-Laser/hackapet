@@ -3,7 +3,7 @@ import displayio
 from sprites.base import Sprite
 
 SPIKE_BITMAP = displayio.OnDiskBitmap("./textures/spike.bmp")
-SPIKE_FRAMEDATA = [1, 4, 1, 1, 4, 2, 4, 1, 1, 1, 20]
+SPIKE_FRAMEDATA = [1, 4, 2, 2, 4, 2, 4, 1, 1, 1, 20]
 
 class Spike(Sprite):
   def __init__(self, *args, **kwargs):
