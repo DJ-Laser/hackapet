@@ -36,6 +36,7 @@ def main(runner: Runner):
         
         player.update(movement_direction, runner.input.middle)
         spike.animate()
+        print(spike.damages_player(player))
 
         runner.refresh()
         if runner.check_exit():

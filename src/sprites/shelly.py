@@ -15,6 +15,11 @@ class Shelly(Sprite):
 
     super().__init__(self._sprite, *args, **kwargs)
 
+    self._left_hitbox_offset = -1
+    self._right_hitbox_offset = self._sprite.tile_width - 1
+    self._top_hitbox_offset = -6
+    self._bottom_hitbox_offset = self._sprite.tile_height
+
     self.float_x = float(self.x)
     self.float_y = float(self.y)
     self.x_velocity = 0
