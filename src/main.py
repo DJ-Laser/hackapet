@@ -20,7 +20,15 @@ def main(runner: Runner):
 
     while True:
         runner.update()
-        player.update(0, False)
+
+        movement_direction = 0
+        if runner.input.left:
+            movement_direction -= 1
+        
+        if runner.input.right:
+            movement_direction += 1
+        
+        player.update(movement_direction, runner.input.middle)
 
         runner.refresh()
         if runner.check_exit():
