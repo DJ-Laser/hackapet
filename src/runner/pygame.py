@@ -21,7 +21,7 @@ class PygameRunner(Runner):
     elif key == pygame.K_d:
       self.input.right = pressed
 
-  def update(self):
+  def _update(self):
     for event in pygame.event.get():
       if event.type == pygame.locals.QUIT:
         self._should_exit = True

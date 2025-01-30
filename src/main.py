@@ -35,8 +35,11 @@ def main(runner: Runner):
             movement_direction += 1
         
         player.update(movement_direction, runner.input.middle)
+        if(runner.input.middle.pressed):
+            spike.spawn_at(random.randint(16, 128 - 16), 96)
+
         spike.animate()
-        print(spike.damages_player(player))
+        #print(spike.damages_player(player))
 
         runner.refresh()
         if runner.check_exit():
