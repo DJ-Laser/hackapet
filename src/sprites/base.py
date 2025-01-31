@@ -1,12 +1,11 @@
+from abc import ABCMeta, abstractmethod
 from typing import Self
 
 import displayio
 
-class Sprite(displayio.Group):
-  def __init__(self, sprite, *args, **kwargs):
+class Sprite(displayio.Group, metaclass=ABCMeta):
+  def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
-    self.append(sprite)
-
     self._left_hitbox_offset = 0
     self._right_hitbox_offset = 0
     self._top_hitbox_offset = 0

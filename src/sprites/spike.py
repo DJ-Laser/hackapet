@@ -7,6 +7,8 @@ SPIKE_FRAMEDATA = [1, 4, 2, 2, 4, 2, 4, 1, 1, 1, 20]
 
 class Spike(Sprite):
   def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
     self._sprite = displayio.TileGrid(
       SPIKE_BITMAP,
       pixel_shader=SPIKE_BITMAP.pixel_shader,
@@ -14,8 +16,8 @@ class Spike(Sprite):
       tile_height=16,
       default_tile=0,
     )
-
-    super().__init__(self._sprite, *args, **kwargs)
+    
+    self.append(self._sprite)
 
     self._left_hitbox_offset = -2
     self._right_hitbox_offset = self._sprite.tile_width - 2

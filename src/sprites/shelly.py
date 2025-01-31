@@ -6,14 +6,15 @@ SHELLY_BITMAP = displayio.OnDiskBitmap("./textures/shelly.bmp")
 
 class Shelly(Sprite):
   def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
     self._sprite = displayio.TileGrid(
       SHELLY_BITMAP,
       pixel_shader=SHELLY_BITMAP.pixel_shader
     )
 
     self._sprite.flip_x = True
-
-    super().__init__(self._sprite, *args, **kwargs)
+    self.append(self._sprite)
 
     self._left_hitbox_offset = -1
     self._right_hitbox_offset = self._sprite.tile_width - 1
