@@ -5,6 +5,7 @@ import displayio
 from sprites.shelly import Shelly
 from runner.base import Runner
 from sprites.spike import Spike
+from sprites.squid import Squid
 
 GROUND_BITMAP = displayio.OnDiskBitmap("textures/ground.bmp")
 
@@ -16,8 +17,10 @@ def main(runner: Runner):
 
     player = Shelly()
     spike = Spike()
+    squid = Squid()
 
     runner.splash.append(ground)
+    runner.splash.append(squid)
     runner.splash.append(player)
     runner.splash.append(spike)
 
@@ -34,12 +37,17 @@ def main(runner: Runner):
         if runner.input.right:
             movement_direction += 1
         
+        if spike.damages_player(player):
+            break
+        
+        squid.update(player)
         player.update(movement_direction, runner.input.middle)
+
         if(runner.input.middle.pressed):
             spike.spawn_at(random.randint(16, 128 - 16), 96)
 
         spike.animate()
-        #print(spike.damages_player(player))
+        
 
         runner.refresh()
         if runner.check_exit():
