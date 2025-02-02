@@ -2,12 +2,27 @@ import time
 import random
 import displayio
 
+from sprites.base import DangerousSprite, AnimatableSprite
 from sprites.shelly import Shelly
 from runner.base import Runner
 from sprites.spike import Spike
 from sprites.squid import Squid
 
 GROUND_BITMAP = displayio.OnDiskBitmap("textures/ground.bmp")
+
+def update_group(group, player) -> bool:
+    for sprite in group:
+            if isinstance(sprite, DangerousSprite):
+                if sprite.is_dangerous() and sprite.collides_with(player):
+                    return True
+
+            if isinstance(sprite, AnimatableSprite):
+                sprite.animate()
+                if sprite.is_animation_finished():
+                    group.remove(sprite)
+                    continue
+    
+    return False
 
 def main(runner: Runner):
     ground = displayio.TileGrid(
@@ -16,13 +31,13 @@ def main(runner: Runner):
     )
 
     player = Shelly()
-    spike = Spike()
+    spikes = displayio.Group()
     squid = Squid()
 
     runner.splash.append(ground)
     runner.splash.append(squid)
     runner.splash.append(player)
-    runner.splash.append(spike)
+    runner.splash.append(spikes)
 
     target_fps = 30
     target_execution_time = 1.0 / target_fps
@@ -36,18 +51,17 @@ def main(runner: Runner):
         
         if runner.input.right:
             movement_direction += 1
-        
-        if spike.damages_player(player):
+
+        player_hit = update_group(spikes, player)
+        if player_hit:
             break
-        
-        squid.update(player)
+
+        squid.update(player, spikes)
+
         player.update(movement_direction, runner.input.middle)
 
         if(runner.input.middle.pressed):
-            spike.spawn_at(random.randint(16, 128 - 16), 96)
-
-        spike.animate()
-        
+            spikes.append(Spike(random.randint(16, 128 - 16), 96))
 
         runner.refresh()
         if runner.check_exit():

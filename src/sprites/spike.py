@@ -1,12 +1,12 @@
 import displayio
 
-from sprites.base import Sprite
+from sprites.base import HitboxOffsetSprite, DangerousSprite, AnimatableSprite
 
 SPIKE_BITMAP = displayio.OnDiskBitmap("./textures/spike.bmp")
 SPIKE_FRAMEDATA = [1, 4, 2, 2, 4, 2, 4, 1, 1, 1, 20]
 
-class Spike(Sprite):
-  def __init__(self, *args, **kwargs):
+class Spike(HitboxOffsetSprite, DangerousSprite, AnimatableSprite):
+  def __init__(self, x, y, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
     self._sprite = displayio.TileGrid(
@@ -19,32 +19,41 @@ class Spike(Sprite):
     
     self.append(self._sprite)
 
-    self._left_hitbox_offset = -2
-    self._right_hitbox_offset = self._sprite.tile_width - 2
-    self._top_hitbox_offset = -5
-    self._bottom_hitbox_offset = self._sprite.tile_height
+    self.x = x
+    self.y = y
 
-    self._current_frame = 10
-    self._frame_counter = 0
+    self._current_frame = 0
     self._update_sprite()
+  
+  @property
+  def _left_hitbox_offset(self):
+    return -2
+
+  @property
+  def _right_hitbox_offset(self):
+    return -2
+  
+  @property
+  def _top_hitbox_offset(self):
+    if self._current_frame >= 7:
+      return -5
+    else:
+      return -6
+  
+  @property
+  def width(self):
+    return self._sprite.tile_width
+
+  @property
+  def height(self):
+    return self._sprite.tile_height
   
   def _update_sprite(self):
     self._sprite[0] = self._current_frame
     self._frame_counter = 0
-
-    if self._current_frame >= 7:
-      self._top_hitbox_offset = -5
-    else:
-      self._top_hitbox_offset = -7
   
   def is_animation_finished(self):
     return self._current_frame == 10
-
-  def spawn_at(self, x, y):
-    self._current_frame = 0
-    self._update_sprite()
-    self. x = x
-    self.y = y
 
   def animate(self):
     if self._frame_counter >= SPIKE_FRAMEDATA[self._current_frame]:
@@ -54,11 +63,8 @@ class Spike(Sprite):
     if not self.is_animation_finished():
       self._frame_counter += 1
 
-  def is_dangerous(self) -> bool:
-    return 5 <= self._current_frame <= 8
+  def is_dangerous(self):
+    return self._current_frame >= 5
   
-  def damages_player(self, player) -> bool:
-    if not self.is_dangerous():
-      return False
-    
-    return self.collides_with(player)
+  def can_remove(self):
+    return self._current_frame >= 8

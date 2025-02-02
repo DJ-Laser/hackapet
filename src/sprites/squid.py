@@ -1,14 +1,34 @@
 import displayio
 
-from sprites.base import Sprite
+from sprites.base import Sprite, HitboxOffsetSprite
 
 import patch
 displayio.Bitmap.__init__ = patch.bitmap_create_init_patched
 
 BRACKET_BITMAP = displayio.OnDiskBitmap("./textures/squid_parts/bracket.bmp")
+MOUTH_BITMAP = displayio.OnDiskBitmap("./textures/squid_parts/mouth.bmp")
 EYE_BITMAP = displayio.OnDiskBitmap("./textures/squid_parts/eye.bmp")
 
-class Eye(Sprite):
+class Mouth(HitboxOffsetSprite):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self._sprite = displayio.TileGrid(
+      MOUTH_BITMAP,
+      pixel_shader=MOUTH_BITMAP.pixel_shader
+    )
+
+    self.append(self._sprite)
+
+  @property
+  def width(self):
+    return self._sprite.tile_width
+
+  @property
+  def height(self):
+    return self._sprite.tile_height
+
+class Eye(HitboxOffsetSprite):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
@@ -48,58 +68,76 @@ class Eye(Sprite):
   @height.setter
   def height(self, value):
     self._bottom_bracket.y = value - self._bottom_bracket.tile_height
-
-  @property
-  def center_x(self):
-    return self.x + self.width // 2
-
-  @center_x.setter
-  def center_x(self, value):
-    self.x = value - self.width // 2
-
-  @property
-  def center_y(self):
-    return self.y + self.height // 2
-
-  @center_y.setter
-  def center_y(self, value):
-    self.y = value - self.height // 2
   
   @property
   def eye_x(self):
-    return self._eye.x - self.center_x + self._eye.tile_width // 2
+    return self._eye.x - self.width // 2 + self._eye.tile_width // 2
   
   @eye_x.setter
   def eye_x(self, value):
-    self._eye.x = value + self.center_x - self._eye.tile_width // 2
+    self._eye.x = value + self.width // 2 - self._eye.tile_width // 2
   
   @property
   def eye_y(self):
-    return self._eye.y - self.center_y + self._eye.tile_height // 2
+    return self._eye.y - self.height // 2 + self._eye.tile_height // 2
   
   @eye_y.setter
   def eye_y(self, value):
-    self._eye.y = value + self.center_y - self._eye.tile_height // 2
+    self._eye.y = value + self.width // 2 - self._eye.tile_height // 2
 
 class Squid(Sprite):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
-    self._mouth 
-
     self._left_eye = Eye()
-    self._left_eye.center_x = 36
+    self._left_eye.center_x = 39
     self._left_eye.center_y = 25
 
     self._right_eye = Eye()
-    self._right_eye.center_x = 128 - 36
+    self._right_eye.center_x = 128 - 39
     self._right_eye.center_y = 25
+
+    self._mouth = Mouth()
+    self._mouth.center_x = 64
+    self._mouth.center_y = 57
 
     self.append(self._left_eye)
     self.append(self._right_eye)
+    self.append(self._mouth)
+
+  @property
+  def width(self):
+    return self.hitbox_width
+
+  @property
+  def height(self):
+    return self.hitbox_height
   
-  def update(self, player: Sprite):
-    player_center_x = (player.left_extent - player.right_extent) // 2
-    player_center_y = (player.top_extent - player.bottom_extent) // 2
+  @property
+  def left_extent(self):
+    return min(self._left_eye.left_extent, self._right_eye.left_extent)
 
+  @property
+  def right_extent(self):
+    return max(self._left_eye.right_extent, self._right_eye.right_extent)
+  
+  @property
+  def top_extent(self):
+    return min(self._left_eye.top_extent, self._right_eye.top_extent)
 
+  @property
+  def bottom_extent(self):
+    return max(self._left_eye.bottom_extent, self._right_eye.bottom_extent)
+
+  def update(self, player: Sprite, spikes: displayio.Group):
+    x_dist = (player.center_x - self.center_x)
+    y_dist = (player.center_y - self.center_y)
+
+    eye_x = x_dist // 10
+    eye_y = y_dist // 19
+
+    self._left_eye.eye_x = eye_x
+    self._left_eye.eye_y = eye_y
+
+    self._right_eye.eye_x = eye_x
+    self._right_eye.eye_y = eye_y

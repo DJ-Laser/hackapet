@@ -1,10 +1,10 @@
 import displayio
 
-from sprites.base import Sprite
+from sprites.base import HitboxOffsetSprite
 
 SHELLY_BITMAP = displayio.OnDiskBitmap("./textures/shelly.bmp")
 
-class Shelly(Sprite):
+class Shelly(HitboxOffsetSprite):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
@@ -15,11 +15,6 @@ class Shelly(Sprite):
 
     self._sprite.flip_x = True
     self.append(self._sprite)
-
-    self._left_hitbox_offset = -1
-    self._right_hitbox_offset = self._sprite.tile_width - 1
-    self._top_hitbox_offset = -6
-    self._bottom_hitbox_offset = self._sprite.tile_height
 
     self.float_x = float(self.x)
     self.float_y = float(self.y)
@@ -36,6 +31,26 @@ class Shelly(Sprite):
     self.max_air_jumps = 1
     self.remaining_air_jumps = self.max_air_jumps
     self.jump_held = False
+  
+  @property
+  def _left_hitbox_offset(self):
+    return -1
+
+  @property
+  def _right_hitbox_offset(self):
+    return -1
+  
+  @property
+  def _top_hitbox_offset(self):
+    return -6
+  
+  @property
+  def width(self):
+    return self._sprite.tile_width
+
+  @property
+  def height(self):
+    return self._sprite.tile_height
   
   def keep_in_bounds(self):
     if self.float_x < self.min_x:
