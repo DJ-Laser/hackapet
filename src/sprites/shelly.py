@@ -1,3 +1,4 @@
+from typing import Self
 import displayio
 
 from sprites.base import HitboxOffsetSprite
@@ -16,8 +17,8 @@ class Shelly(HitboxOffsetSprite):
     self._sprite.flip_x = True
     self.append(self._sprite)
 
-    self.float_x = float(self.x)
-    self.float_y = float(self.y)
+    self._float_x = 0
+    self._float_y = 0
     self.x_velocity = 0
     self.y_velocity = 0
     
@@ -31,6 +32,40 @@ class Shelly(HitboxOffsetSprite):
     self.max_air_jumps = 1
     self.remaining_air_jumps = self.max_air_jumps
     self.jump_held = False
+
+  @property
+  def float_x(self) -> float:
+    return self._float_x
+  
+  @float_x.setter
+  def float_x(self, value):
+    super(Shelly, type(self)).x.__set__(self, int(value))
+    self._float_x = value
+
+  @property
+  def x(self) -> int:
+    return int(self.float_x)
+  
+  @x.setter
+  def x(self, value):
+    self.float_x = value  
+
+  @property
+  def float_y(self) -> float:
+    return self._float_y
+  
+  @float_y.setter
+  def float_y(self, value):
+    super(Shelly, type(self)).y.__set__(self, int(value))
+    self._float_y = value
+  
+  @property
+  def y(self) -> int:
+    return int(self.float_y)
+  
+  @y.setter
+  def y(self, value: float):
+    self.float_y = value
   
   @property
   def _left_hitbox_offset(self):
@@ -54,21 +89,21 @@ class Shelly(HitboxOffsetSprite):
   
   def keep_in_bounds(self):
     if self.float_x < self.min_x:
-      self.float_x = self.min_x
+      self.x = self.min_x
       self.x_velocity = 0
 
     max_x = self.max_x - self._sprite.tile_width
     if self.float_x > max_x:
-      self.float_x = max_x
+      self.x = max_x
       self.x_velocity = 0
 
     if self.float_y < self.min_y:
-      self.float_y = self.min_y
+      self.y = self.min_y
       self.y_velocity = 0
 
     max_y = self.max_y - self._sprite.tile_height
     if self.float_y > max_y:
-      self.float_y = max_y
+      self.y = max_y
       self.y_velocity = 0
   
   def clamp_x_velocity(self, limit):
@@ -124,5 +159,3 @@ class Shelly(HitboxOffsetSprite):
     self.float_x += self.x_velocity
 
     self.keep_in_bounds()
-    self.x = int(self.float_x)
-    self.y = int(self.float_y)
