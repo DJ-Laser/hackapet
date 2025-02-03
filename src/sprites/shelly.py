@@ -1,11 +1,10 @@
-from typing import Self
 import displayio
 
-from sprites.base import HitboxOffsetSprite
+from sprites.base import HitboxOffsetSprite, FloatVelocitySprite
 
 SHELLY_BITMAP = displayio.OnDiskBitmap("./textures/shelly.bmp")
 
-class Shelly(HitboxOffsetSprite):
+class Shelly(HitboxOffsetSprite, FloatVelocitySprite):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
@@ -17,55 +16,11 @@ class Shelly(HitboxOffsetSprite):
     self._sprite.flip_x = True
     self.append(self._sprite)
 
-    self._float_x = 0
-    self._float_y = 0
-    self.x_velocity = 0
-    self.y_velocity = 0
-    
-    self.min_x = 0
-    self.max_x = 128
-    self.min_y = -5
-    self.max_y = 112
-
     self.grounded = False
 
     self.max_air_jumps = 1
     self.remaining_air_jumps = self.max_air_jumps
     self.jump_held = False
-
-  @property
-  def float_x(self) -> float:
-    return self._float_x
-  
-  @float_x.setter
-  def float_x(self, value):
-    super(Shelly, type(self)).x.__set__(self, int(value))
-    self._float_x = value
-
-  @property
-  def x(self) -> int:
-    return int(self.float_x)
-  
-  @x.setter
-  def x(self, value):
-    self.float_x = value  
-
-  @property
-  def float_y(self) -> float:
-    return self._float_y
-  
-  @float_y.setter
-  def float_y(self, value):
-    super(Shelly, type(self)).y.__set__(self, int(value))
-    self._float_y = value
-  
-  @property
-  def y(self) -> int:
-    return int(self.float_y)
-  
-  @y.setter
-  def y(self, value: float):
-    self.float_y = value
   
   @property
   def _left_hitbox_offset(self):
@@ -86,25 +41,6 @@ class Shelly(HitboxOffsetSprite):
   @property
   def height(self):
     return self._sprite.tile_height
-  
-  def keep_in_bounds(self):
-    if self.float_x < self.min_x:
-      self.x = self.min_x
-      self.x_velocity = 0
-
-    max_x = self.max_x - self._sprite.tile_width
-    if self.float_x > max_x:
-      self.x = max_x
-      self.x_velocity = 0
-
-    if self.float_y < self.min_y:
-      self.y = self.min_y
-      self.y_velocity = 0
-
-    max_y = self.max_y - self._sprite.tile_height
-    if self.float_y > max_y:
-      self.y = max_y
-      self.y_velocity = 0
   
   def clamp_x_velocity(self, limit):
     self.x_velocity = max(-limit, min(self.x_velocity, limit))

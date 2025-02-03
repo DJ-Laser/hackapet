@@ -104,6 +104,73 @@ class HitboxOffsetSprite(Sprite, metaclass=ABCMeta):
   def bottom_extent(self) -> int:
     return self.y + self.height + self._bottom_hitbox_offset
 
+class FloatVelocitySprite(Sprite):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self.min_x = 0
+    self.max_x = 128
+    self.min_y = -5
+    self.max_y = 112
+
+    self._float_x = 0
+    self._float_y = 0
+    self.x_velocity = 0
+    self.y_velocity = 0
+  
+  @property
+  def float_x(self) -> float:
+    return self._float_x
+  
+  @float_x.setter
+  def float_x(self, value):
+    super(FloatVelocitySprite, type(self)).x.__set__(self, int(value))
+    self._float_x = value
+
+  @property
+  def x(self) -> int:
+    return int(self.float_x)
+  
+  @x.setter
+  def x(self, value):
+    self.float_x = value  
+
+  @property
+  def float_y(self) -> float:
+    return self._float_y
+  
+  @float_y.setter
+  def float_y(self, value):
+    super(FloatVelocitySprite, type(self)).y.__set__(self, int(value))
+    self._float_y = value
+  
+  @property
+  def y(self) -> int:
+    return int(self.float_y)
+  
+  @y.setter
+  def y(self, value: float):
+    self.float_y = value
+
+  def keep_in_bounds(self):
+    if self.float_x < self.min_x:
+      self.x = self.min_x
+      self.x_velocity = 0
+
+    max_x = self.max_x - self.width
+    if self.float_x > max_x:
+      self.x = max_x
+      self.x_velocity = 0
+
+    if self.float_y < self.min_y:
+      self.y = self.min_y
+      self.y_velocity = 0
+
+    max_y = self.max_y - self.height
+    if self.float_y > max_y:
+      self.y = max_y
+      self.y_velocity = 0
+
 @runtime_checkable
 class DangerousSprite(Protocol):
   @abstractmethod
