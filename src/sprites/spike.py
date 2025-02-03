@@ -6,7 +6,7 @@ SPIKE_BITMAP = displayio.OnDiskBitmap("./textures/spike.bmp")
 SPIKE_FRAMEDATA = [1, 4, 2, 2, 4, 2, 4, 1, 1, 1, 20]
 
 class Spike(HitboxOffsetSprite, DangerousSprite, AnimatableSprite):
-  def __init__(self, x, y, *args, **kwargs):
+  def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
     self._sprite = displayio.TileGrid(
@@ -18,9 +18,6 @@ class Spike(HitboxOffsetSprite, DangerousSprite, AnimatableSprite):
     )
     
     self.append(self._sprite)
-
-    self.x = x
-    self.y = y
 
     self._current_frame = 0
     self._update_sprite()

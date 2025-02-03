@@ -32,13 +32,13 @@ def main(runner: Runner):
     player.center_x = 64
     player.y = 128 - 32
 
-    spikes = displayio.Group()
+    dangers = displayio.Group()
     squid = Squid()
 
     runner.splash.append(ground)
     runner.splash.append(squid)
     runner.splash.append(player)
-    runner.splash.append(spikes)
+    runner.splash.append(dangers)
 
     target_fps = 30
     target_execution_time = 1.0 / target_fps
@@ -53,11 +53,11 @@ def main(runner: Runner):
         if runner.input.right:
             movement_direction += 1
 
-        player_hit = update_group(spikes, player)
+        player_hit = update_group(dangers, player)
         if player_hit:
             break
 
-        squid.update(player, spikes)
+        squid.update(player, dangers)
 
         player.update(movement_direction, runner.input.middle)
 

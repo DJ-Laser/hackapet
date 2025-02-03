@@ -1,7 +1,7 @@
 import random
 import displayio
 
-from sprites.base import Sprite, HitboxOffsetSprite
+from sprites.base import FloatVelocitySprite, Sprite, HitboxOffsetSprite
 
 import patch
 from sprites.spike import Spike
@@ -107,7 +107,7 @@ class Squid(Sprite):
     self.append(self._right_eye)
     self.append(self._mouth)
 
-    self._spike_spawn_cooldown = 30
+    self._time_since_last_danger = -5
 
   @property
   def width(self):
@@ -146,15 +146,39 @@ class Squid(Sprite):
     self._right_eye.eye_x = eye_x
     self._right_eye.eye_y = eye_y
 
-  def spawn_spike(self, player, spikes):
-    spikes.append(Spike(random.randint(0, 128 - 16), 96))
-    self._spike_spawn_cooldown = 15
+  def spawn_spike(self, dangers, predicted_x):
+    spike = Spike()
+    spike.center_x = max(8, min(predicted_x, 120))
+    spike.y = 96
 
-  def update(self, player: Sprite, spikes: displayio.Group):
+    dangers.append(spike)
+
+  def predict_player_position(self, player, lookahead_time) -> tuple[int, int]:
+    lookahead_time = 10
+
+    predicted_x = player.center_x + player.x_velocity * lookahead_time
+    predicted_y = player.center_y + player.y_velocity * lookahead_time
+
+    predicted_x = max(0, min(predicted_x, 128))
+    predicted_y = max(0, min(predicted_y, 128))
+
+    return (int(predicted_x), int(predicted_y))
+
+  def spawn_danger(self, player: FloatVelocitySprite, dangers):
+    lookahead_time = random.randint(5, 10)
+    if random.random() < 0.2:
+      lookahead_time = random.randint(0, 3)
+
+    (predicted_x, predicted_y) = self.predict_player_position(player, lookahead_time)
+
+    if self._time_since_last_danger >= 10 and \
+      predicted_y + player.width // 2 >= 106:
+      self.spawn_spike(dangers, predicted_x)
+      self._time_since_last_danger = 0
+  
+  def update(self, player: FloatVelocitySprite, spikes: displayio.Group):
     self.track_player(player)
+    self.spawn_danger(player, spikes)
+    
+    self._time_since_last_danger += 1
 
-
-    if self._spike_spawn_cooldown <= 0:
-      self.spawn_spike(player, spikes)
-      
-    self._spike_spawn_cooldown -= 1
