@@ -1,8 +1,10 @@
+import random
 import displayio
 
 from sprites.base import Sprite, HitboxOffsetSprite
 
 import patch
+from sprites.spike import Spike
 displayio.Bitmap.__init__ = patch.bitmap_create_init_patched
 
 BRACKET_BITMAP = displayio.OnDiskBitmap("./textures/squid_parts/bracket.bmp")
@@ -105,6 +107,8 @@ class Squid(Sprite):
     self.append(self._right_eye)
     self.append(self._mouth)
 
+    self._spike_spawn_cooldown = 30
+
   @property
   def width(self):
     return self.hitbox_width
@@ -129,7 +133,7 @@ class Squid(Sprite):
   def bottom_extent(self):
     return max(self._left_eye.bottom_extent, self._right_eye.bottom_extent)
 
-  def update(self, player: Sprite, spikes: displayio.Group):
+  def track_player(self, player: Sprite):
     x_dist = (player.center_x - self.center_x)
     y_dist = (player.center_y - self.center_y)
 
@@ -141,3 +145,16 @@ class Squid(Sprite):
 
     self._right_eye.eye_x = eye_x
     self._right_eye.eye_y = eye_y
+
+  def spawn_spike(self, player, spikes):
+    spikes.append(Spike(random.randint(0, 128 - 16), 96))
+    self._spike_spawn_cooldown = 15
+
+  def update(self, player: Sprite, spikes: displayio.Group):
+    self.track_player(player)
+
+
+    if self._spike_spawn_cooldown <= 0:
+      self.spawn_spike(player, spikes)
+      
+    self._spike_spawn_cooldown -= 1

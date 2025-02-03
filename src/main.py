@@ -1,11 +1,9 @@
 import time
-import random
 import displayio
 
 from sprites.base import DangerousSprite, AnimatableSprite
 from sprites.shelly import Shelly
 from runner.base import Runner
-from sprites.spike import Spike
 from sprites.squid import Squid
 
 GROUND_BITMAP = displayio.OnDiskBitmap("textures/ground.bmp")
@@ -31,6 +29,9 @@ def main(runner: Runner):
     )
 
     player = Shelly()
+    player.center_x = 64
+    player.y = 128 - 32
+
     spikes = displayio.Group()
     squid = Squid()
 
@@ -59,9 +60,6 @@ def main(runner: Runner):
         squid.update(player, spikes)
 
         player.update(movement_direction, runner.input.middle)
-
-        if(runner.input.middle.pressed):
-            spikes.append(Spike(random.randint(16, 128 - 16), 96))
 
         runner.refresh()
         if runner.check_exit():
