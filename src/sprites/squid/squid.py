@@ -29,7 +29,7 @@ class Squid(Sprite):
     self.append(self._right_eye)
     self.append(self._mouth)
 
-    self._time_since_last_danger = -5
+    self.reset()
 
   @property
   def width(self):
@@ -54,6 +54,9 @@ class Squid(Sprite):
   @property
   def bottom_extent(self):
     return max(self._left_eye.bottom_extent, self._right_eye.bottom_extent, self._mouth.bottom_extent)
+
+  def reset(self):
+    self._time_since_last_danger = -5
 
   def track_player(self, player: Sprite):
     x_dist = (player.center_x - (self._left_eye.center_x +  self._right_eye.center_x) // 2)

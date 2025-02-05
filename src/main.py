@@ -14,8 +14,8 @@ from sprites.squid.squid import Squid
 
 GROUND_BITMAP = displayio.OnDiskBitmap("textures/ground.bmp")
 
-def update_dangers(group, player, score) -> bool:
-    for sprite in group:
+def update_dangers(dangers, player, score) -> bool:
+    for sprite in dangers:
             if isinstance(sprite, DangerousSprite):
                 if sprite.is_dangerous() and sprite.collides_with(player):
                     return True
@@ -26,7 +26,7 @@ def update_dangers(group, player, score) -> bool:
                     if isinstance(sprite, DangerousSprite):
                         score.increase(sprite.get_score(player))
 
-                    group.remove(sprite)
+                    dangers.remove(sprite)
                     continue
     
     return False
@@ -38,12 +38,8 @@ def main(runner: Runner):
     )
 
     player = Shelly()
-    player.center_x = 64
-    player.y = 128 - 32
-
     dangers = displayio.Group()
     squid = Squid()
-    
     score_text = Score()
 
     runner.splash.append(ground)
@@ -52,12 +48,19 @@ def main(runner: Runner):
     runner.splash.append(dangers)
     runner.splash.append(score_text)
 
-    target_fps = 30
-    target_execution_time = 1.0 / target_fps
-    while True:
-        start_time = time.perf_counter()
-        runner.update()
+    def reset():
+        player.center_x = 64
+        player.y = 128 - 32 - 20
+        player.x_velocity = 0
+        player.y_velocity = 0
 
+        score_text.reset()
+        squid.reset()
+
+        while len(dangers) > 0:
+            dangers.pop()
+
+    def run_game_loop():
         movement_direction = 0
         if runner.input.left:
             movement_direction -= 1
@@ -68,11 +71,22 @@ def main(runner: Runner):
         player_hit = update_dangers(dangers, player, score_text)
         if player_hit:
             print("Your score was:", score_text.score)
-            break
+            reset()
+            return
 
         squid.update(player, dangers)
 
         player.update(movement_direction, runner.input.middle)
+
+    reset()
+
+    target_fps = 30
+    target_execution_time = 1.0 / target_fps
+    while True:
+        start_time = time.perf_counter()
+        runner.update()
+
+        run_game_loop()
 
         runner.refresh()
         if runner.check_exit():
