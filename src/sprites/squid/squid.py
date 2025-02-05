@@ -9,6 +9,10 @@ from sprites.squid.eye import Eye
 from sprites.squid.mouth import Mouth
 from sprites.squid.predicted_player import PredictedPlayer
 
+# 30 fps
+HANDICAP_LOWER_FRAMES = [(5 * 30) + (i * 5 * 30) for i in range(10)]
+
+
 class Squid(Sprite):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -57,6 +61,13 @@ class Squid(Sprite):
 
   def reset(self):
     self._time_since_last_danger = -5
+    self._danger_spawn_handicap = 10
+    self._current_game_frames = 0
+    self._handicap_lower_thresholds = HANDICAP_LOWER_FRAMES.copy()
+  
+  def reset_danger_time(self, additional_handicap=0):
+    # negative numbers means it has to go back t 0 first, increasing the delay
+    self._time_since_last_danger = 0 - additional_handicap - self._danger_spawn_handicap
 
   def track_player(self, player: Sprite):
     x_dist = (player.center_x - (self._left_eye.center_x +  self._right_eye.center_x) // 2)
@@ -119,10 +130,16 @@ class Squid(Sprite):
     prediction.step(lookahead_time)
 
     if self.spawn_spike(prediction.copy(), dangers):
-      self._time_since_last_danger = 0
+      self.reset_danger_time()
   
   def update(self, player: FloatVelocitySprite, spikes: displayio.Group):
     self.track_player(player)
     self.spawn_danger(player, spikes)
+
+    if len(self._handicap_lower_thresholds) > 0 and \
+      self._current_game_frames > self._handicap_lower_thresholds[0]:
+      self._handicap_lower_thresholds.pop(0)
+      self._danger_spawn_handicap -= 1
     
+    self._current_game_frames += 1
     self._time_since_last_danger += 1
