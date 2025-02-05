@@ -41,26 +41,26 @@ class Squid(Sprite):
   
   @property
   def left_extent(self):
-    return min(self._left_eye.left_extent, self._right_eye.left_extent)
+    return min(self._left_eye.left_extent, self._right_eye.left_extent, self._mouth.left_extent)
 
   @property
   def right_extent(self):
-    return max(self._left_eye.right_extent, self._right_eye.right_extent)
+    return max(self._left_eye.right_extent, self._right_eye.right_extent, self._mouth.right_extent)
   
   @property
   def top_extent(self):
-    return min(self._left_eye.top_extent, self._right_eye.top_extent)
+    return min(self._left_eye.top_extent, self._right_eye.top_extent, self._mouth.top_extent)
 
   @property
   def bottom_extent(self):
-    return max(self._left_eye.bottom_extent, self._right_eye.bottom_extent)
+    return max(self._left_eye.bottom_extent, self._right_eye.bottom_extent, self._mouth.bottom_extent)
 
   def track_player(self, player: Sprite):
-    x_dist = (player.center_x - self.center_x)
-    y_dist = (player.center_y - self.center_y)
+    x_dist = (player.center_x - (self._left_eye.center_x +  self._right_eye.center_x) // 2)
+    y_dist = (player.center_y - (self._left_eye.center_y +  self._right_eye.center_y) // 2)
 
     eye_x = x_dist // 10
-    eye_y = y_dist // 19
+    eye_y = y_dist // 15
 
     self._left_eye.eye_x = eye_x
     self._left_eye.eye_y = eye_y
@@ -72,6 +72,7 @@ class Squid(Sprite):
     if self._time_since_last_danger < 10:
       return False
     
+    spike_lookahead_frames = random.randint(6, 7)
     in_air = False
 
     # find the first moment before the player lands
@@ -80,18 +81,23 @@ class Squid(Sprite):
 
       if prediction.timesteps == 0:
         # We started on the ground, use the correct number for spikes
-        prediction.timesteps = random.randint(5, 7)
+        prediction.timesteps = spike_lookahead_frames
         break
     else:
       # in air, step to landing
-      prediction.step()
       in_air = True
+      prediction.step()
+
+    if prediction.timesteps > spike_lookahead_frames:
+        return False
 
     offset_x = prediction.offset_x
     if in_air:
       current_height = prediction.max_y - prediction.at(0).bottom_extent
+      scale_factor = current_height * prediction.x_velocity * 100
 
-      offset_x *= min(1 / (current_height * prediction.x_velocity) / 30, 1)
+      if scale_factor > 1:
+        pass#offset_x /= scale_factor
 
     spike_x = int(prediction.center_x + offset_x)
     spike_x = max(8, min(spike_x, 120))
@@ -109,8 +115,7 @@ class Squid(Sprite):
     prediction = PredictedPlayer(player)
     prediction.step(lookahead_time)
 
-    if (prediction.bottom_extent >= 110 or prediction.y_velocity > 5) and \
-      self.spawn_spike(prediction.copy(), dangers):
+    if self.spawn_spike(prediction.copy(), dangers):
       self._time_since_last_danger = 0
   
   def update(self, player: FloatVelocitySprite, spikes: displayio.Group):
