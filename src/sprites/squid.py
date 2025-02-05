@@ -1,3 +1,4 @@
+import math
 import random
 import displayio
 
@@ -144,13 +145,6 @@ class Squid(Sprite):
     self._right_eye.eye_x = eye_x
     self._right_eye.eye_y = eye_y
 
-  def spawn_spike(self, dangers, predicted_x):
-    spike = Spike()
-    spike.center_x = max(8, min(predicted_x, 120))
-    spike.y = 96
-
-    dangers.append(spike)
-
   def predict_player_position(self, player, lookahead_time) -> tuple[int, int]:
     lookahead_time = 10
 
@@ -162,16 +156,35 @@ class Squid(Sprite):
 
     return (int(predicted_x), int(predicted_y))
 
-  def spawn_danger(self, player: FloatVelocitySprite, dangers):
+  def spawn_spike(self, player, dangers, lookahead_time) -> bool:
+    if self._time_since_last_danger < 10:
+      return False
+
+    (predicted_x, predicted_y) = self.predict_player_position(player, lookahead_time)
+
+    offset_x = predicted_x - player.x
+    offset_x *= random.uniform(0.7, 1)
+    offset_x += math.copysign(112 - (predicted_y + player.height // 2), offset_x)
+
+    spike_x = int(player.x + offset_x)
+    spike_x = max(8, min(spike_x, 120))
+
+    spike = Spike()
+    spike.center_x = spike_x
+    spike.y = 96
+
+    dangers.append(spike)
+    return True
+
+  def spawn_danger(self, player: FloatVelocitySprite, dangers: displayio.Group):
     lookahead_time = random.randint(5, 10)
     if random.random() < 0.2:
       lookahead_time = random.randint(0, 3)
 
     (predicted_x, predicted_y) = self.predict_player_position(player, lookahead_time)
 
-    if self._time_since_last_danger >= 10 and \
-      predicted_y + player.width // 2 >= 106:
-      self.spawn_spike(dangers, predicted_x)
+    if predicted_y + player.height // 2 >= 104 and \
+      self.spawn_spike(player, dangers, lookahead_time):
       self._time_since_last_danger = 0
   
   def update(self, player: FloatVelocitySprite, spikes: displayio.Group):
