@@ -10,7 +10,7 @@ from sprites.score import Score
 from sprites.base import DangerousSprite, AnimatableSprite
 from sprites.shelly import Shelly
 from runner.base import Runner
-from sprites.squid import Squid
+from sprites.squid.squid import Squid
 
 GROUND_BITMAP = displayio.OnDiskBitmap("textures/ground.bmp")
 
