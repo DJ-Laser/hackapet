@@ -3,9 +3,7 @@ import displayio
 
 from sprites.base import FloatVelocitySprite, Sprite, HitboxOffsetSprite
 
-import patch
 from sprites.spike import Spike
-displayio.Bitmap.__init__ = patch.bitmap_create_init_patched
 
 BRACKET_BITMAP = displayio.OnDiskBitmap("./textures/squid_parts/bracket.bmp")
 MOUTH_BITMAP = displayio.OnDiskBitmap("./textures/squid_parts/mouth.bmp")
@@ -181,4 +179,3 @@ class Squid(Sprite):
     self.spawn_danger(player, spikes)
     
     self._time_since_last_danger += 1
-

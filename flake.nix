@@ -63,7 +63,7 @@
         pythonEnv = python.withPackages projectPackages;
       in {
         devShells.default = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [alejandra pythonEnv aseprite];
+          nativeBuildInputs = with pkgs; [alejandra pythonEnv aseprite fontforge-gtk];
         };
       }
     );

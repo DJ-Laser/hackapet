@@ -1,5 +1,12 @@
 import time
 import displayio
+from adafruit_display_text import label
+from adafruit_bitmap_font import bitmap_font
+
+import patch
+from blinka_displayio_pygamedisplay import PyGameDisplay
+PyGameDisplay._initialize = patch.blinka_pygame_display_initalize_patched
+PyGameDisplay.refresh = patch.blinka_pygame_display_pygamerefresh_patched
 
 from sprites.base import DangerousSprite, AnimatableSprite
 from sprites.shelly import Shelly
@@ -7,6 +14,7 @@ from runner.base import Runner
 from sprites.squid import Squid
 
 GROUND_BITMAP = displayio.OnDiskBitmap("textures/ground.bmp")
+FONT = bitmap_font.load_font("fonts/munro-10.bdf")
 
 def update_group(group, player) -> bool:
     for sprite in group:
@@ -34,11 +42,16 @@ def main(runner: Runner):
 
     dangers = displayio.Group()
     squid = Squid()
+    
+    score_label = label.Label(font=FONT, text="Score: 0", color=0xFFFF00)
+    score_label.anchor_point = (1, 0)
+    score_label.anchored_position = (128, 0)
 
     runner.splash.append(ground)
     runner.splash.append(squid)
     runner.splash.append(player)
     runner.splash.append(dangers)
+    runner.splash.append(score_label)
 
     target_fps = 30
     target_execution_time = 1.0 / target_fps
