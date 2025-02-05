@@ -152,6 +152,12 @@ class FloatVelocitySprite(Sprite):
   def y(self, value: float):
     self.float_y = value
 
+  def clamp_x_velocity(self, limit):
+    self.x_velocity = max(-limit, min(self.x_velocity, limit))
+
+  def clamp_y_velocity(self, limit):
+    self.y_velocity = max(-limit, min(self.y_velocity, limit))
+
   def keep_in_bounds(self):
     if self.float_x < self.min_x:
       self.x = self.min_x

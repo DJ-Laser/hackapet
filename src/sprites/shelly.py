@@ -41,12 +41,6 @@ class Shelly(HitboxOffsetSprite, FloatVelocitySprite):
   @property
   def height(self):
     return self._sprite.tile_height
-  
-  def clamp_x_velocity(self, limit):
-    self.x_velocity = max(-limit, min(self.x_velocity, limit))
-
-  def clamp_y_velocity(self, limit):
-    self.y_velocity = max(-limit, min(self.y_velocity, limit))
 
   def check_grounded(self):
     self.grounded = self.float_y >= self.max_y - self._sprite._pixel_height
