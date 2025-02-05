@@ -177,6 +177,10 @@ class DangerousSprite(Protocol):
   def is_dangerous(self) -> bool:
     return False
 
+  @abstractmethod
+  def get_score(self, player) -> int:
+    return 0
+
 @runtime_checkable
 class AnimatableSprite(Protocol):
   @abstractmethod

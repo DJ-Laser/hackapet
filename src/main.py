@@ -1,22 +1,20 @@
 import time
 import displayio
-from adafruit_display_text import label
-from adafruit_bitmap_font import bitmap_font
 
 import patch
 from blinka_displayio_pygamedisplay import PyGameDisplay
 PyGameDisplay._initialize = patch.blinka_pygame_display_initalize_patched
 PyGameDisplay.refresh = patch.blinka_pygame_display_pygamerefresh_patched
 
+from sprites.score import Score
 from sprites.base import DangerousSprite, AnimatableSprite
 from sprites.shelly import Shelly
 from runner.base import Runner
 from sprites.squid import Squid
 
 GROUND_BITMAP = displayio.OnDiskBitmap("textures/ground.bmp")
-FONT = bitmap_font.load_font("fonts/munro-10.bdf")
 
-def update_group(group, player) -> bool:
+def update_dangers(group, player, score) -> bool:
     for sprite in group:
             if isinstance(sprite, DangerousSprite):
                 if sprite.is_dangerous() and sprite.collides_with(player):
@@ -25,6 +23,9 @@ def update_group(group, player) -> bool:
             if isinstance(sprite, AnimatableSprite):
                 sprite.animate()
                 if sprite.is_animation_finished():
+                    if isinstance(sprite, DangerousSprite):
+                        score.increase(sprite.get_score(player))
+
                     group.remove(sprite)
                     continue
     
@@ -43,15 +44,13 @@ def main(runner: Runner):
     dangers = displayio.Group()
     squid = Squid()
     
-    score_label = label.Label(font=FONT, text="Score: 0", color=0xFFFF00)
-    score_label.anchor_point = (1, 0)
-    score_label.anchored_position = (128, 0)
+    score_text = Score()
 
     runner.splash.append(ground)
     runner.splash.append(squid)
     runner.splash.append(player)
     runner.splash.append(dangers)
-    runner.splash.append(score_label)
+    runner.splash.append(score_text)
 
     target_fps = 30
     target_execution_time = 1.0 / target_fps
@@ -66,7 +65,7 @@ def main(runner: Runner):
         if runner.input.right:
             movement_direction += 1
 
-        player_hit = update_group(dangers, player)
+        player_hit = update_dangers(dangers, player, score_text)
         if player_hit:
             break
 

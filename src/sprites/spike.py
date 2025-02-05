@@ -63,5 +63,8 @@ class Spike(HitboxOffsetSprite, DangerousSprite, AnimatableSprite):
   def is_dangerous(self):
     return self._current_frame >= 5
   
+  def get_score(self, player):
+    return 1
+  
   def can_remove(self):
     return self._current_frame >= 8
