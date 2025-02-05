@@ -67,6 +67,7 @@ def main(runner: Runner):
 
         player_hit = update_dangers(dangers, player, score_text)
         if player_hit:
+            print("Your score was:", score_text.score)
             break
 
         squid.update(player, dangers)

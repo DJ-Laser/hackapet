@@ -25,6 +25,10 @@ class Score(HitboxOffsetSprite):
   @property
   def height(self):
     self._sprite.height
+
+  @property
+  def score(self):
+    return self._score
   
   def _update_text(self):
     self._sprite.text = "Score: " + str(self._score)
