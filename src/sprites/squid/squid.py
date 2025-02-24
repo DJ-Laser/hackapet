@@ -132,8 +132,11 @@ class Squid(Sprite):
     if self.spawn_spike(prediction.copy(), dangers):
       self.reset_danger_time()
   
-  def update(self, player: FloatVelocitySprite, spikes: displayio.Group):
+  def update(self, player: FloatVelocitySprite, spikes: displayio.Group, peaceful_mode = False):
     self.track_player(player)
+    if peaceful_mode:
+      return
+
     self.spawn_danger(player, spikes)
 
     if len(self._handicap_lower_thresholds) > 0 and \
