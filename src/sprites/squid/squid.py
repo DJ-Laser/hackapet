@@ -5,6 +5,7 @@ import displayio
 from sprites.base import FloatVelocitySprite, Sprite
 
 from sprites.spike import Spike
+from sprites.squid.dialogue import Dialouge
 from sprites.squid.eye import Eye
 from sprites.squid.mouth import Mouth
 from sprites.squid.predicted_player import PredictedPlayer
@@ -29,9 +30,15 @@ class Squid(Sprite):
     self._mouth.center_x = 64
     self._mouth.center_y = 57
 
+    self._dialouge = Dialouge()
+    self._dialouge.set_text("Hello human. Welcome to my simulation! Press Left+Right to start the \"fun\"")
+    self._dialouge.position = (64, 72)
+    self._dialouge.anchor = (0.5, 0.5)
+
     self.append(self._left_eye)
     self.append(self._right_eye)
     self.append(self._mouth)
+    self.append(self._dialouge)
 
     self.reset()
 
@@ -134,9 +141,12 @@ class Squid(Sprite):
   
   def update(self, player: FloatVelocitySprite, spikes: displayio.Group, peaceful_mode = False):
     self.track_player(player)
+    self._dialouge.update()
+    
     if peaceful_mode:
       return
 
+    self._dialouge.clear()
     self.spawn_danger(player, spikes)
 
     if len(self._handicap_lower_thresholds) > 0 and \
