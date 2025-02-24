@@ -1,9 +1,60 @@
+import random
 from adafruit_display_text import label, wrap_text_to_pixels
 from adafruit_bitmap_font import bitmap_font
 
 from sprites.base import HitboxOffsetSprite
 
 FONT = bitmap_font.load_font("fonts/munro-10.bdf")
+
+TEXT_OVER_20 = [
+  "I'm impressed!",
+  "Maybe I should raise the difficulty...",
+  "That was a showing of pure skill... Until that spike hit you."
+]
+
+TEXT_20 = [
+  "Good, but not good enough!",
+  "Remember to double jump.",
+  "Hahahah, got you.",
+]
+
+TEXT_10 = [
+  "Too easy!",
+  "Get good LOL.",
+  "Skill issue.",
+  "The goal is to NOT get hit.",
+  "Do you need me to lower the difficulty?",
+]
+
+TEXT_5 = [
+  "Were you even trying?",
+  "Come on, Do better!",
+  "Just dodge, its not that hard.",
+]
+
+TEXT_0 = [
+  "Riveting gameplay here...",
+  "Don't just sit there!",
+  "Wooooooooow...",
+  "Just jump over the spike >:(",
+]
+
+def choose_dialogue(score_achieved: int) -> str:
+  dialogue_options = [""];
+
+  if score_achieved == 0:
+    dialogue_options = TEXT_0
+  elif score_achieved < 5:
+    dialogue_options = TEXT_5
+  elif score_achieved < 10:
+    dialogue_options = TEXT_10
+  elif score_achieved < 20:
+    dialogue_options = TEXT_20
+  else:
+    dialogue_options = TEXT_OVER_20
+  
+  return random.choice(dialogue_options)
+  
 
 class Dialouge(HitboxOffsetSprite):
   def __init__(self, high_score_mode = False, *args, **kwargs):

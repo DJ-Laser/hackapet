@@ -5,7 +5,7 @@ import displayio
 from sprites.base import FloatVelocitySprite, Sprite
 
 from sprites.spike import Spike
-from sprites.squid.dialogue import Dialouge
+from sprites.squid.dialogue import Dialouge, choose_dialogue
 from sprites.squid.eye import Eye
 from sprites.squid.mouth import Mouth
 from sprites.squid.predicted_player import PredictedPlayer
@@ -66,12 +66,15 @@ class Squid(Sprite):
   def bottom_extent(self):
     return max(self._left_eye.bottom_extent, self._right_eye.bottom_extent, self._mouth.bottom_extent)
 
-  def reset(self):
+  def reset(self, score_achieved: int = -1):
+    if score_achieved > -1:
+      self._dialouge.set_text(choose_dialogue(score_achieved))
+
     self._time_since_last_danger = -5
     self._danger_spawn_handicap = 10
     self._current_game_frames = 0
     self._handicap_lower_thresholds = HANDICAP_LOWER_FRAMES.copy()
-  
+
   def reset_danger_time(self, additional_handicap=0):
     # negative numbers means it has to go back t 0 first, increasing the delay
     self._time_since_last_danger = 0 - additional_handicap - self._danger_spawn_handicap
@@ -138,7 +141,7 @@ class Squid(Sprite):
 
     if self.spawn_spike(prediction.copy(), dangers):
       self.reset_danger_time()
-  
+
   def update(self, player: FloatVelocitySprite, spikes: displayio.Group, peaceful_mode = False):
     self.track_player(player)
     self._dialouge.update()

@@ -50,7 +50,7 @@ def main(runner: Runner):
     runner.splash.append(dangers)
     runner.splash.append(score_text)
 
-    def reset():
+    def reset(game_start = False):
         nonlocal peaceful_mode, game_begin_cooldown_frames
 
         player.center_x = 64
@@ -61,8 +61,10 @@ def main(runner: Runner):
         score_text.set_high_score_mode(True)
         game_begin_cooldown_frames = 20
 
+        if not game_start:
+            squid.reset(score_text.score)
+        
         score_text.reset()
-        squid.reset()
 
         while len(dangers) > 0:
             dangers.pop()
@@ -99,7 +101,7 @@ def main(runner: Runner):
 
         player.update(movement_direction, runner.input.middle)
 
-    reset()
+    reset(True)
 
     target_fps = 30
     target_execution_time = 1.0 / target_fps
